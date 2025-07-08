@@ -1,0 +1,12 @@
+@use './variables' as *;
+@use './components/header' as *;
+@use './components/grid' as *;
+@use './components/keypad' as *;
+
+* {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+body {
+    background: $body-background;
+}
+

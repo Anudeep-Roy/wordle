@@ -1,0 +1,29 @@
+@use '../variables.scss' as *;
+
+.grid {
+    max-height: calc(100% - 210px - 65px);
+    display: flex;
+    justify-content: center;
+    margin: 60px 0 0;
+    .board {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        .row {
+            display: flex;
+            gap: 5px;
+            .box {
+                border: 2px solid $border-color;
+                height: 62px;
+                width: 62px;
+                text-transform: uppercase;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 32px;
+                font-weight: bold;
+            }
+        }
+    }
+}
