@@ -87,17 +87,47 @@ export default function Wordle() {
       result = ["+", "+", "+", "+", "+"];
 
     } else { 
+      let temp = [];
       let guessArray = guess.split('');
       let currentWordArray = currentWord.split('');
+      let obj = {};
       for (let i = 0; i < currentWord.length; i++) {
+        if (obj[currentWord[i]]) {
+          obj[currentWord[i]] += 1;
+        } else {
+          obj[currentWord[i]] = 1;
+        }
+        
+      }
+      console.log('obj',obj)
+      for (let i = 0; i < currentWord.length; i++) {
+        // if (temp.includes(guess[i])) {
+        //   result[i] = "-";
+        //   continue;
+        // }
         if (currentWord.includes(guessArray[i])) {
-          if (currentWordArray[i] == guessArray[i]) {
+          if (currentWordArray[i] == guessArray[i] && obj[guessArray[i]] > 0 ) {
+            obj[guessArray[i]] -= 1;
             result[i] = "+";
           } else {
-            result[i] = "X";
+            for (let k = 0; k < 5; k++){
+                if (currentWordArray[k] === guessArray[k]) {
+                  obj[guessArray[k]] -= 1;
+                   result[k] = "+";
+                } else {
+                   result[i] = "-";
+                }
+              }
+            if (obj[guessArray[i]] > 0) {
+              result[i] = "X";
+              obj[guessArray[i]] -= 1;
+              console.log('obj',obj)
+            }
+            //  temp[i] = result[i];
           }
         } else { 
           result[i] = "-";
+          // temp[i] = result[i];
         }
       }
       console.log(result.join(''));
