@@ -23,6 +23,15 @@
                 align-items: center;
                 font-size: 32px;
                 font-weight: bold;
+                &.wrong {
+                    background: $yellow;
+                }
+                &.right {
+                    background: $green;
+                }
+                &.neutral {
+                    background: $gray;
+                }
             }
         }
     }

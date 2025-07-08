@@ -3,12 +3,12 @@ import { KeyContext } from "./keyContext";
 import Header from "./components/header";
 import Grid from "./components/grid";
 import Keypad from "./components/keypad/keypad";
-
+import data from '../words.json';
 
 
 export default function Wordle() {
-  const words = ['heart', 'lions', 'cloud', 'space', 'apple'];
-  const [word, setWord] = useState("");
+  const words = data.words;
+  const [guess, setGuess] = useState("");
   const [currentWord, setCurrentWord] = useState([]);
   const [currentRow, setCurrentRow] = useState(0);
   const [currentColumn, setCurrentColumn] = useState(0);
@@ -27,6 +27,23 @@ export default function Wordle() {
     console.log(words[randomIndex]);
   }, [])
 
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      const currentkey = e.key;
+      if (/^[a-zA-Z]$/.test(currentkey)) {
+        enterLetter(currentkey);
+      } else if (currentkey === 'Enter') {
+        validateWord();
+      } else if (currentkey === 'Backspace') {
+        console.log('Back');
+        backspace();
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentColumn]);
+
+
   function checkValue(value) {
     if (value === "enter") { 
       validateWord();
@@ -38,12 +55,11 @@ export default function Wordle() {
   }
 
   function enterLetter(letter) {
-    console.log('letter : ', letter);
-    if (currentColumn < 5 && letter!='enter') {
+    if (currentColumn < 5 && (letter!='enter' || letter!='Enter')) {
       let userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);
       let userCell = userRow.querySelector(`.box:nth-child(${currentColumn + 1})`);
       userCell.textContent = letter;
-      setCurrentColumn(currentColumn + 1);
+      setCurrentColumn(prev => prev + 1);
     }
   }
 
@@ -55,13 +71,51 @@ export default function Wordle() {
         let userCell = userRow.querySelector(`.box:nth-child(${i})`);
         currentGuess.push(userCell.textContent);
       }
-      setWord(currentGuess.join(''));
+      setGuess(currentGuess.join(''));
       console.log(currentGuess.join(''));
+      verifyGuess(currentGuess.join(''));
       setCurrentColumn(0);
-      setCurrentRow(currentRow + 1);
+      setCurrentRow(prev => prev + 1);
     }
   }
+  function verifyGuess(guess) { 
+    let result = [];
+    console.log("guess", guess);
+    console.log("current", currentWord);
+    if (currentWord == guess) {
+      console.log("Oi ! u have guessed it ryt ");
+      result = ["+", "+", "+", "+", "+"];
 
+    } else { 
+      let guessArray = guess.split('');
+      let currentWordArray = currentWord.split('');
+      for (let i = 0; i < currentWord.length; i++) {
+        if (currentWord.includes(guessArray[i])) {
+          if (currentWordArray[i] == guessArray[i]) {
+            result[i] = "+";
+          } else {
+            result[i] = "X";
+          }
+        } else { 
+          result[i] = "-";
+        }
+      }
+      console.log(result.join(''));
+    }
+    let userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);
+      for (let i = 0; i < result.length; i++) {
+        if (result[i] === '+') {
+          let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
+          userCell.classList.add('right');
+        } else if (result[i] === 'X') {
+          let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
+          userCell.classList.add('wrong');
+        } else {
+          let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
+          userCell.classList.add('neutral');
+        }
+      }
+  }
   function backspace() {
     if (currentColumn > 0) {
       const userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);
