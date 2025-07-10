@@ -9,8 +9,11 @@ import data from '../words.json';
 export default function Wordle() {
   const words = data.words;
   const [guess, setGuess] = useState("");
+  const [guessArray, setGuessArray] = useState([]);
+  const [resultArray, setResultArray] = useState([]);
   const [currentWord, setCurrentWord] = useState([]);
   const [currentRow, setCurrentRow] = useState(0);
+  const [resultObj, setResultObj] = useState([]);
   const [currentColumn, setCurrentColumn] = useState(0);
   const [grid, setGrid] = useState([
     ["", "", "", "", ""],
@@ -20,6 +23,16 @@ export default function Wordle() {
     ["", "", "", "", ""],
     ["", "", "", "", ""],
   ]);
+  const [keyStates, setKeyStates] = useState(() => {
+  const allKeys = [
+    ...'qwertyuiop'.split(''),
+    ...'asdfghjkl'.split(''),
+    'enter',
+    ...'zxcvbnm'.split(''),
+    , 'delete'
+  ];
+  return allKeys.map(k => ({ value: k, symbol: '*' }));
+});
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * words.length);
@@ -86,9 +99,9 @@ export default function Wordle() {
       console.log("Oi ! u have guessed it ryt ");
       result = ["+", "+", "+", "+", "+"];
 
-    } else { 
-      let temp = [];
-      let guessArray = guess.split('');
+    } else {
+      setGuessArray(guess.split(''));
+      let guessedArray = guess.split('');
       let currentWordArray = currentWord.split('');
       let obj = {};
       for (let i = 0; i < currentWord.length; i++) {
@@ -105,22 +118,22 @@ export default function Wordle() {
         //   result[i] = "-";
         //   continue;
         // }
-        if (currentWord.includes(guessArray[i])) {
-          if (currentWordArray[i] == guessArray[i] && obj[guessArray[i]] > 0 ) {
-            obj[guessArray[i]] -= 1;
+        if (currentWord.includes(guessedArray[i])) {
+          if (currentWordArray[i] == guessedArray[i] && obj[guessedArray[i]] > 0 ) {
+            obj[guessedArray[i]] -= 1;
             result[i] = "+";
           } else {
             for (let k = 0; k < 5; k++){
-                if (currentWordArray[k] === guessArray[k]) {
-                  obj[guessArray[k]] -= 1;
+                if (currentWordArray[k] === guessedArray[k]) {
+                  obj[guessedArray[k]] -= 1;
                    result[k] = "+";
                 } else {
                    result[i] = "-";
                 }
               }
-            if (obj[guessArray[i]] > 0) {
+            if (obj[guessedArray[i]] > 0) {
               result[i] = "X";
-              obj[guessArray[i]] -= 1;
+              obj[guessedArray[i]] -= 1;
               console.log('obj',obj)
             }
             //  temp[i] = result[i];
@@ -130,6 +143,7 @@ export default function Wordle() {
           // temp[i] = result[i];
         }
       }
+      setResultArray(result);
       console.log(result.join(''));
     }
     let userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);
@@ -145,6 +159,19 @@ export default function Wordle() {
           userCell.classList.add('neutral');
         }
       }
+    let resultsObj = [];
+    let guessedArray = guess.split('');
+    for (var i = 0; i < result.length; i++) {
+      let vaule = guessedArray[i];
+      let symbol = result[i];
+      let letter = {
+        value: vaule,
+        symbol : symbol
+      }
+      resultsObj.push(letter);
+    }
+    setResultObj(resultsObj);
+    console.log('Result obj : ', resultsObj);
   }
   function backspace() {
     if (currentColumn > 0) {
@@ -154,9 +181,8 @@ export default function Wordle() {
       setCurrentColumn(currentColumn - 1);
     }
   }
-
   return (
-    <KeyContext value={{ checkValue }}>
+    <KeyContext value={{ checkValue, resultObj, guessArray, keyStates, setKeyStates }}>
       <div className="wordle">
         <Header />
         <Grid />
