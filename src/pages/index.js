@@ -15,6 +15,7 @@ export default function Wordle() {
   const [currentRow, setCurrentRow] = useState(0);
   const [resultObj, setResultObj] = useState([]);
   const [currentColumn, setCurrentColumn] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [grid, setGrid] = useState([
     ["", "", "", "", ""],
     ["", "", "", "", ""],
@@ -37,19 +38,19 @@ export default function Wordle() {
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * words.length);
     setCurrentWord(words[randomIndex]);
-    console.log(words[randomIndex]);
   }, [])
 
   useEffect(() => {
     const handleKeyPress = (e) => {
-      const currentkey = e.key;
-      if (/^[a-zA-Z]$/.test(currentkey)) {
-        enterLetter(currentkey);
-      } else if (currentkey === 'Enter') {
-        validateWord();
-      } else if (currentkey === 'Backspace') {
-        console.log('Back');
-        backspace();
+      if (!isSuccess) {
+        const currentkey = e.key;
+        if (/^[a-zA-Z]$/.test(currentkey)) {
+          enterLetter(currentkey);
+        } else if (currentkey === 'Enter') {
+          validateWord();
+        } else if (currentkey === 'Backspace') {
+          backspace();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyPress);
@@ -83,20 +84,20 @@ export default function Wordle() {
       for (var i = 1; i <= 5; i++) {
         let userCell = userRow.querySelector(`.box:nth-child(${i})`);
         currentGuess.push(userCell.textContent);
+        //setDelay(userCell, i*500)
       }
       setGuess(currentGuess.join(''));
-      console.log(currentGuess.join(''));
       verifyGuess(currentGuess.join(''));
       setCurrentColumn(0);
       setCurrentRow(prev => prev + 1);
     }
   }
+
   function verifyGuess(guess) { 
+
     let result = [];
-    console.log("guess", guess);
-    console.log("current", currentWord);
+    guess === currentWord && setIsSuccess(true);
     if (currentWord == guess) {
-      console.log("Oi ! u have guessed it ryt ");
       result = ["+", "+", "+", "+", "+"];
 
     } else {
@@ -112,7 +113,6 @@ export default function Wordle() {
         }
         
       }
-      console.log('obj',obj)
       for (let i = 0; i < currentWord.length; i++) {
         // if (temp.includes(guess[i])) {
         //   result[i] = "-";
@@ -134,7 +134,6 @@ export default function Wordle() {
             if (obj[guessedArray[i]] > 0) {
               result[i] = "X";
               obj[guessedArray[i]] -= 1;
-              console.log('obj',obj)
             }
             //  temp[i] = result[i];
           }
@@ -144,19 +143,21 @@ export default function Wordle() {
         }
       }
       setResultArray(result);
-      console.log(result.join(''));
     }
     let userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);
       for (let i = 0; i < result.length; i++) {
         if (result[i] === '+') {
           let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
-          userCell.classList.add('right');
+          //userCell.classList.add('right', 'rotate');
+          setDelay(userCell, 'right', i * 500);
         } else if (result[i] === 'X') {
           let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
-          userCell.classList.add('wrong');
+          //userCell.classList.add('wrong', 'rotate' );
+           setDelay(userCell, 'wrong', i * 500);
         } else {
           let userCell = userRow.querySelector(`.box:nth-child(${i + 1})`);
-          userCell.classList.add('neutral');
+          //userCell.classList.add('neutral', 'rotate' );
+           setDelay(userCell, 'neutral', i * 500);
         }
       }
     let resultsObj = [];
@@ -171,8 +172,14 @@ export default function Wordle() {
       resultsObj.push(letter);
     }
     setResultObj(resultsObj);
-    console.log('Result obj : ', resultsObj);
   }
+  
+  function setDelay(userCell, colorCode, delay) { 
+    setTimeout(() => {
+     userCell.classList.add(colorCode, 'rotate' );
+    }, delay);
+  }
+
   function backspace() {
     if (currentColumn > 0) {
       const userRow = document.querySelector(`.board .row:nth-child(${currentRow + 1})`);

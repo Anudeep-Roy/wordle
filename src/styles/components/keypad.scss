@@ -1,3 +1,5 @@
+@use '../variables.scss' as *;
+
 .keypad {
     display: flex;
     justify-content: center;
@@ -21,6 +23,15 @@
             color: white;
             &.enter {
                 font-size: 10px;
+            }
+            &.green {
+                background: $green;
+            }
+            &.yellow {
+                background: $yellow;
+            }
+            &.gray {
+                background: $gray;
             }
         }
     }

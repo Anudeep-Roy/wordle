@@ -7,7 +7,7 @@ export default function Key({ value, icon, symbol }) {
     const { checkValue } = useContext(KeyContext);
 
     return (
-        <button type="button" className={`key ${value === 'enter' ? 'enter' : ''} `} onClick={() => checkValue(value)}>
+        <button type="button" className={`key ${value === 'enter' ? 'enter' : ''} ${symbol==="+" ? "green" : symbol==="X" ? "yellow" : symbol==="-" ? "gray" : ""}`} onClick={() => checkValue(value)}>
             {value==='delete'? <Icon icon={faDeleteLeft} /> : value}
         </button>
     );
